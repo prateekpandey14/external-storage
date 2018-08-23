@@ -124,8 +124,9 @@ type CASVolumeSpec struct {
 	TargetPort string `json:"targetPort"`
 	// Replicas will hold the replica count for this volume
 	Replicas string `json:"replicas"`
+	// CasType will hold the storage engine used to provision this volume
+	CasType string `json:"casType"`
 	// TODO add controller and replica status
-
 }
 
 // CASVolumeStatus provides status of a cas volume

@@ -117,6 +117,7 @@ func (p *openEBSCASProvisioner) Provision(options controller.VolumeOptions) (*v1
 	volAnnotations := make(map[string]string)
 	volAnnotations = Setlink(volAnnotations, options.PVName)
 	volAnnotations["openEBSProvisionerIdentity"] = p.identity
+	volAnnotations["openebs.io/cas-type"] = casVolume.Spec.CasType
 
 	fsType, err := ParseClassParameters(options.Parameters)
 	if err != nil {
