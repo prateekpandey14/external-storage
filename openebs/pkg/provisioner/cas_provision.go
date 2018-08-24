@@ -91,7 +91,7 @@ func (p *openEBSCASProvisioner) Provision(options controller.VolumeOptions) (*v1
 		mapLabels[string(v1alpha1.StorageClassKey)] = *className
 		casVolume.Labels = mapLabels
 	}
-	PVName := options.PVC.Namespace + "-" + options.PVC.Name + util_rand.String(7)
+	PVName := options.PVC.Namespace + "-" + options.PVC.Name + "-" + util_rand.String(7)
 
 	casVolume.Labels[string(v1alpha1.NamespaceKey)] = options.PVC.Namespace
 	casVolume.Namespace = options.PVC.Namespace
