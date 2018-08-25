@@ -19,7 +19,6 @@ package provisioner
 import (
 	"errors"
 	"fmt"
-	"hash/fnv"
 	"os"
 
 	"github.com/golang/glog"
@@ -181,11 +180,4 @@ func (p *openEBSCASProvisioner) Delete(volume *v1.PersistentVolume) error {
 	}
 
 	return nil
-}
-
-// pvcHash generates a hash intenger from a string
-func pvcHash(s string) uint32 {
-	h := fnv.New32a()
-	h.Write([]byte(s))
-	return h.Sum32()
 }
