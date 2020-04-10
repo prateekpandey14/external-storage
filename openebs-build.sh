@@ -25,9 +25,17 @@ cd $DST_REPO/external-storage/openebs
 make container
 rc=$?; if [[ $rc != 0 ]]; then exit $rc; fi
 
-echo "Building snapshot-controller and snapshot-provisioner"
 cd $DST_REPO/external-storage/snapshot
 export REGISTRY="openebs/"
 export VERSION="ci"
-make container
-rc=$?; if [[ $rc != 0 ]]; then exit $rc; fi
+
+if [ "$TRAVIS_CPU_ARCH" == "amd64" ]; then
+  echo "Building snapshot-controller and snapshot-provisioner"
+  make container
+  rc=$?; if [[ $rc != 0 ]]; then exit $rc; fi
+
+elif [ "$TRAVIS_CPU_ARCH" == "arm64" ]; then
+   echo "Building arm64 snapshot-controller and snapshot-provisioner"
+   make container.arm64
+  rc=$?; if [[ $rc != 0 ]]; then exit $rc; fi
+fi

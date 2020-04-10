@@ -83,6 +83,19 @@ container-quick:
 	docker build -t $(MUTABLE_IMAGE_PROVISIONER) deploy/docker/provisioner
 	docker tag $(MUTABLE_IMAGE_PROVISIONER) $(IMAGE_PROVISIONER)
 
+container.arm64: controller provisioner
+	cp _output/bin/snapshot-controller deploy/docker/controller
+	cp _output/bin/snapshot-provisioner deploy/docker/provisioner
+	# Copy the root CA certificates -- cloudproviders need them
+	cp -Rf deploy/ca-certificates/* deploy/docker/controller/.
+	cp -Rf deploy/ca-certificates/* deploy/docker/provisioner/.
+	docker build -t $(MUTABLE_IMAGE_CONTROLLER) -f deploy/docker/controller/Dockerfile.arm64 deploy/docker/controller
+	docker tag $(MUTABLE_IMAGE_CONTROLLER) $(IMAGE_CONTROLLER)
+	docker build -t $(MUTABLE_IMAGE_PROVISIONER) -f deploy/docker/provisioner/Dockerfile.arm64 deploy/docker/provisioner
+	docker tag $(MUTABLE_IMAGE_PROVISIONER) $(IMAGE_PROVISIONER)
+
+
+
 push: container
 	docker push $(IMAGE_CONTROLLER)
 	docker push $(MUTABLE_IMAGE_CONTROLLER)
