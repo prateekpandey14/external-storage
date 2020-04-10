@@ -36,6 +36,18 @@ ifeq ($(VERSION),)
 	VERSION = latest
 endif
 
+ifeq (${BASE_DOCKER_IMAGE_ARM64}, )
+  BASE_DOCKER_IMAGE_ARM64 = "arm64v8/alpine"
+  export BASE_DOCKER_IMAGE_ARM64
+endif
+
+ifeq (${ARCH},linux_arm64)
+  BASE_IMAGE:=${BASE_DOCKER_IMAGE_ARM64}
+else
+	BASE_IMAGE:="alpine:3.11.5"
+endif
+export BASEIMAGE
+
 ifeq ($(ARCH),linux_arm64)
   IMAGE_CONTROLLER = $(REGISTRY)snapshot-controller-arm64:$(VERSION)
   MUTABLE_IMAGE_CONTROLLER = $(REGISTRY)snapshot-controller-arm64:latest
@@ -78,23 +90,10 @@ container-quick:
 	# Copy the root CA certificates -- cloudproviders need them
 	cp -Rf deploy/ca-certificates/* deploy/docker/controller/.
 	cp -Rf deploy/ca-certificates/* deploy/docker/provisioner/.
-	docker build -t $(MUTABLE_IMAGE_CONTROLLER) deploy/docker/controller
+	docker build -t $(MUTABLE_IMAGE_CONTROLLER) deploy/docker/controller --build-arg BASE_IMAGE=${BASE_IMAGE}
 	docker tag $(MUTABLE_IMAGE_CONTROLLER) $(IMAGE_CONTROLLER)
-	docker build -t $(MUTABLE_IMAGE_PROVISIONER) deploy/docker/provisioner
+	docker build -t $(MUTABLE_IMAGE_PROVISIONER) deploy/docker/provisioner --build-arg BASE_IMAGE=${BASE_IMAGE}
 	docker tag $(MUTABLE_IMAGE_PROVISIONER) $(IMAGE_PROVISIONER)
-
-container.arm64: controller provisioner
-	cp _output/bin/snapshot-controller deploy/docker/controller
-	cp _output/bin/snapshot-provisioner deploy/docker/provisioner
-	# Copy the root CA certificates -- cloudproviders need them
-	cp -Rf deploy/ca-certificates/* deploy/docker/controller/.
-	cp -Rf deploy/ca-certificates/* deploy/docker/provisioner/.
-	docker build -t $(MUTABLE_IMAGE_CONTROLLER) -f deploy/docker/controller/Dockerfile.arm64 deploy/docker/controller
-	docker tag $(MUTABLE_IMAGE_CONTROLLER) $(IMAGE_CONTROLLER)
-	docker build -t $(MUTABLE_IMAGE_PROVISIONER) -f deploy/docker/provisioner/Dockerfile.arm64 deploy/docker/provisioner
-	docker tag $(MUTABLE_IMAGE_PROVISIONER) $(IMAGE_PROVISIONER)
-
-
 
 push: container
 	docker push $(IMAGE_CONTROLLER)

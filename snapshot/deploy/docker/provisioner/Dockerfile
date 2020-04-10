@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM alpine:3.6
+ARG BASE_IMAGE=alpine:3.11.5
+FROM $BASE_IMAGE
 
 RUN apk add --no-cache \
     bash \
